@@ -2,22 +2,68 @@
 import { GoogleGenAI, Type } from "@google/genai";
 import { Plant, AiRecommendation, WeatherInfo } from '../types.ts';
 
-if (!process.env.API_KEY) {
-  // This is a placeholder check. In a real environment, the key should be present.
-  // We won't throw an error here to allow the UI to function without an API key for demo purposes.
-  console.warn("API_KEY environment variable not set. Gemini API calls will fail.");
-}
+const isApiKeyPlaceholder = (key: string | undefined): boolean => {
+  if (!key) return true;
+  const k = key.trim().toUpperCase();
+  return k === "" || k === "PLACEHOLDER_API_KEY" || k === "PLACEHOLDER" || k === "DUMMY_KEY_FOR_DEMO";
+};
 
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY || "DUMMY_KEY_FOR_DEMO" });
+const getLocalSimulatedRecommendation = (plant: Plant): AiRecommendation => {
+  const type = plant.type;
+  const health = plant.health;
+  const temp = plant.temperature;
+  const moisture = plant.soilMoisture;
+  const ph = plant.ph;
+  const light = plant.lightLumens;
+
+  let urgency: 'urgent' | 'normal' | 'optimal' = 'normal';
+  let suggestion = `Maintain current conditions for ${plant.name} (${type}). Keep tracking environmental metrics regularly.`;
+
+  if (health === 'Poor' || health === 'Needs Care') {
+    urgency = health === 'Poor' ? 'urgent' : 'normal';
+    if (moisture > 90) {
+      suggestion = `Overwatering detected (${moisture}%). Hold irrigation immediately to avoid root rot and let the soil dry out.`;
+    } else if (moisture < 45) {
+      suggestion = `Soil is dry (${moisture}%). Apply water to raise moisture level back to the optimal 60-85% range.`;
+    } else if (temp > 30) {
+      suggestion = `Ambient temperature is elevated (${temp}°C). Provide temporary shade or activate active cooling blower.`;
+    } else if (temp < 15) {
+      suggestion = `Cold conditions detected (${temp}°C). Protect plant from draft or adjust indoor heater configuration.`;
+    } else if (ph < 5.8) {
+      suggestion = `Soil pH is acidic (${ph}). Add a small amount of garden lime to raise pH toward neutral.`;
+    } else if (ph > 7.4) {
+      suggestion = `Soil pH is alkaline (${ph}). Integrate organic compost or iron sulfate to lower the pH range.`;
+    } else if (light < 10000) {
+      suggestion = `Low light level (${(light/1000).toFixed(1)}k lm). Relocate plant or activate the custom grow LED grid.`;
+    } else if (light > 30000) {
+      suggestion = `Direct sunlight is too high (${(light/1000).toFixed(1)}k lm). Provide diffused shading screens.`;
+    } else {
+      suggestion = `Conditions are borderline. Monitor soil moisture daily and ensure balanced mineral dosing.`;
+    }
+  } else {
+    urgency = 'optimal';
+    if (moisture > 85) {
+      suggestion = `Moisture is high (${moisture}%). Hold watering.`;
+    } else if (moisture < 50) {
+      suggestion = `Moisture is moderate (${moisture}%). Plan a light watering session.`;
+    } else {
+      suggestion = `Your ${type} is thriving with perfect parameters. Current care schedules are working optimally.`;
+    }
+  }
+
+  return { urgency, suggestion };
+};
+
+const apiKey = process.env.API_KEY;
+const ai = new GoogleGenAI({ apiKey: isApiKeyPlaceholder(apiKey) ? "DUMMY_KEY_FOR_DEMO" : apiKey });
 
 export const getCareRecommendation = async (plant: Plant): Promise<AiRecommendation> => {
-    if (!process.env.API_KEY) {
-        // Return a dummy recommendation if API key is not available
-        return {
-            urgency: 'normal',
-            suggestion: 'API key not configured. Please add your Gemini API key to see smart recommendations.'
-        };
-    }
+  if (isApiKeyPlaceholder(apiKey)) {
+    console.warn("Gemini API key is not configured or is placeholder. Using local simulation engine.");
+    // Add brief artificial delay to simulate AI processing for realistic UX
+    await new Promise(resolve => setTimeout(resolve, 800));
+    return getLocalSimulatedRecommendation(plant);
+  }
   
   const prompt = `
     You are a master gardener AI specializing in plant care.
@@ -63,8 +109,10 @@ export const getCareRecommendation = async (plant: Plant): Promise<AiRecommendat
     return parsedData;
 
   } catch (error) {
-    console.error("Failed to get care recommendation from Gemini API:", error);
-    throw new Error("Could not fetch AI recommendation. Please try again.");
+    console.warn("Failed to get care recommendation from Gemini API, falling back to local simulation:", error);
+    // Add brief artificial delay to simulate processing before returning fallback
+    await new Promise(resolve => setTimeout(resolve, 500));
+    return getLocalSimulatedRecommendation(plant);
   }
 };
 
