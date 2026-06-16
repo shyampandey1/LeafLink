@@ -496,7 +496,7 @@ const ActuatorControl: React.FC<ActuatorControlProps> = ({
                     ? 'bg-sky-100 dark:bg-sky-900/30 text-sky-600 dark:text-sky-400 animate-pulse' 
                     : 'bg-gray-100 dark:bg-gray-800 text-gray-500'
                 }`}>
-                  <Wind className={`w-6 h-6 ${actuators.coolingFan.active ? 'animate-spin' : ''}`} />
+                  <Wind className={`w-6 h-6 ${actuators.coolingFan.active ? 'animate-breeze' : ''}`} />
                 </div>
                 <div>
                   <h4 className="font-bold text-gray-900 dark:text-white">Active Cooling Blower</h4>

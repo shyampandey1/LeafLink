@@ -45,3 +45,19 @@ body {
   -ms-overflow-style: none !important;
   scrollbar-width: none !important;
 }
+
+/* Custom wind blowing breeze animation */
+@keyframes breeze {
+  0%, 100% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  50% {
+    transform: translateX(6px);
+    opacity: 0.7;
+  }
+}
+
+.animate-breeze {
+  animation: breeze 1.5s ease-in-out infinite;
+}
