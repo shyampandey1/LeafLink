@@ -558,7 +558,7 @@ const App: React.FC = () => {
                     Indoor zones are pristine. Saffron outdoor crops require temperature cooling monitoring.
                   </p>
                 </div>
-                <div className="p-4.5 bg-white/10 rounded-2xl border border-white/10 shrink-0">
+                <div className="p-4 bg-white/10 rounded-2xl border border-white/10 shrink-0">
                   <Sprout className="w-8 h-8 text-emerald-200 animate-pulse" />
                 </div>
               </div>

@@ -164,7 +164,7 @@ const AdvisoryPage: React.FC<AdvisoryPageProps> = ({ plants, onTriggerAction }) 
               <button
                 onClick={fetchAiAdvisory}
                 disabled={loading}
-                className="flex items-center gap-1.5 px-4.5 py-2.5 bg-purple-600 hover:bg-purple-700 disabled:bg-gray-300 dark:disabled:bg-gray-800 text-white font-bold text-xs rounded-xl shadow-sm hover:shadow-md cursor-pointer transition"
+                className="flex items-center gap-1.5 px-4 py-2.5 bg-purple-600 hover:bg-purple-700 disabled:bg-gray-300 dark:disabled:bg-gray-800 text-white font-bold text-xs rounded-xl shadow-sm hover:shadow-md cursor-pointer transition"
               >
                 {loading ? (
                   <RefreshCw className="w-3.5 h-3.5 animate-spin" />

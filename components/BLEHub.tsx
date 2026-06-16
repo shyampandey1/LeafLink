@@ -244,12 +244,12 @@ const BLEHub: React.FC<BLEHubProps> = ({
           </div>
           <button
             onClick={onToggleOffline}
-            className={`w-12 h-6.5 rounded-full transition-colors relative focus:outline-none ${
+            className={`w-12 h-6.5 rounded-full transition-colors relative flex items-center px-[4px] border border-transparent ${
               offlineMode ? 'bg-amber-500' : 'bg-green-500'
             }`}
           >
-            <div className={`w-4.5 h-4.5 rounded-full bg-white absolute top-1 transition-transform ${
-              offlineMode ? 'translate-x-6' : 'translate-x-1'
+            <div className={`w-[18px] h-[18px] rounded-full bg-white transition-transform ${
+              offlineMode ? 'translate-x-[22px]' : 'translate-x-0'
             }`} />
           </button>
         </div>
