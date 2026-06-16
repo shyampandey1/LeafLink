@@ -69,7 +69,7 @@ export const getCareRecommendation = async (plant: Plant): Promise<AiRecommendat
 };
 
 export const getWeatherInfo = async (location: { lat: number; lon: number } | null): Promise<WeatherInfo> => {
-  const fallbackData: WeatherInfo = { city: 'Ludhiana', temperature: 29, condition: 'Partly Cloudy', humidity: 80, windSpeed: 10 };
+  const fallbackData: WeatherInfo = { city: 'Aujala', temperature: 29, condition: 'Partly Cloudy', humidity: 80, windSpeed: 10 };
   
   if (!process.env.API_KEY) {
       console.warn("API_KEY not set. Returning dummy weather data.");
@@ -78,7 +78,7 @@ export const getWeatherInfo = async (location: { lat: number; lon: number } | nu
   
   const locationQuery = location
     ? `for the location with latitude ${location.lat} and longitude ${location.lon}`
-    : 'in Ludhiana, India';
+    : 'in Aujala, Punjab, India';
   
   const prompt = `
     What is the current weather ${locationQuery}? 

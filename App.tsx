@@ -98,6 +98,10 @@ const App: React.FC = () => {
   const [weatherLoading, setWeatherLoading] = useState(true);
   const [weatherError, setWeatherError] = useState<string | null>(null);
   const [isSyncing, setIsSyncing] = useState(false);
+  const [defaultCity, setDefaultCity] = useState<string>(() => {
+    const cached = localStorage.getItem('smart_garden_default_city');
+    return cached || 'Aujala, Punjab';
+  });
 
   // Synchronize layout changes to localStorage
   useEffect(() => {
@@ -290,7 +294,7 @@ const App: React.FC = () => {
   // Fetch weather parameters
   const fetchWeather = useCallback(async (location: { lat: number; lon: number } | null) => {
     if (offlineMode) {
-      setWeatherInfo({ city: 'Ludhiana (Local Cache)', temperature: 27, condition: 'Partly Cloudy', humidity: 75, windSpeed: 8 });
+      setWeatherInfo({ city: 'Aujala (Local Cache)', temperature: 27, condition: 'Partly Cloudy', humidity: 75, windSpeed: 8 });
       setWeatherLoading(false);
       return;
     }
@@ -343,8 +347,8 @@ const App: React.FC = () => {
               console.error("IP geolocation failed:", ipError);
             }
             
-            // Hard fallback to Ludhiana, India coordinates if IP lookup also fails
-            fetchWeather({ lat: 30.9120, lon: 75.8538 });
+            // Hard fallback to Aujala, Punjab coordinates if IP lookup also fails
+            fetchWeather({ lat: 30.761838, lon: 76.632890 });
           }
         );
       } else {
@@ -654,6 +658,12 @@ const App: React.FC = () => {
             theme={theme}
             toggleTheme={toggleTheme}
             onResetDatabase={handleResetSystemDB}
+            defaultCity={defaultCity}
+            onUpdateDefaultCity={(city) => {
+              setDefaultCity(city);
+              localStorage.setItem('smart_garden_default_city', city);
+              fetchWeather(city);
+            }}
           />
         );
 
