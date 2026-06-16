@@ -21,13 +21,18 @@ interface SettingsPageProps {
   theme: 'light' | 'dark';
   toggleTheme: () => void;
   onResetDatabase: () => void;
+  defaultCity: string;
+  onUpdateDefaultCity: (city: string) => void;
 }
 
 const SettingsPage: React.FC<SettingsPageProps> = ({
   theme,
   toggleTheme,
-  onResetDatabase
+  onResetDatabase,
+  defaultCity,
+  onUpdateDefaultCity
 }) => {
+  const [localCityInput, setLocalCityInput] = useState(defaultCity);
   // Wifi setup inputs
   const [ssid, setSsid] = useState('Home_Mesh_2G');
   const [password, setPassword] = useState('MySmartGardenSecret');
@@ -401,6 +406,26 @@ const SettingsPage: React.FC<SettingsPageProps> = ({
                 </>
               )}
             </button>
+          </div>
+
+          <div className="border-t border-gray-100 dark:border-gray-800 pt-4 space-y-2.5">
+            <div className="text-xs font-semibold text-gray-600 dark:text-gray-400 font-outfit">Fallback Weather Location</div>
+            <div className="flex gap-2">
+              <input
+                type="text"
+                value={localCityInput}
+                onChange={e => setLocalCityInput(e.target.value)}
+                placeholder="e.g. Chandigarh, India"
+                className="flex-1 text-xs font-semibold p-2.5 bg-gray-50 dark:bg-brand-dark-bg border border-gray-100 dark:border-gray-800 rounded-xl text-gray-805 dark:text-white"
+              />
+              <button
+                onClick={() => onUpdateDefaultCity(localCityInput)}
+                className="px-4 py-2.5 bg-brand-green hover:bg-green-600 text-white font-bold text-xs rounded-xl transition cursor-pointer"
+              >
+                Apply Location
+              </button>
+            </div>
+            <p className="text-[10px] text-gray-400">Used as the weather location whenever browser GPS location coordinates are unavailable or blocked.</p>
           </div>
 
           <div className="border-t border-gray-100 dark:border-gray-800 pt-4 text-[10px] text-gray-400 flex items-start gap-1.5">
