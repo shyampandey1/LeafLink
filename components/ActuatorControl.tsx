@@ -252,12 +252,12 @@ const ActuatorControl: React.FC<ActuatorControlProps> = ({
               {/* HomeKit Style Toggle Button */}
               <button
                 onClick={togglePumpIndoor}
-                className={`w-14 h-8 rounded-full transition-colors relative focus:outline-none ${
-                  actuators.pumpIndoor.active ? 'bg-blue-500' : 'bg-gray-300 dark:bg-gray-700'
+                className={`w-14 h-8 rounded-full transition-colors relative focus:outline-none border ${
+                  actuators.pumpIndoor.active ? 'bg-blue-500 border-transparent' : 'bg-gray-250 dark:bg-gray-900 border-gray-300 dark:border-gray-805'
                 }`}
               >
-                <div className={`w-6 h-6 rounded-full bg-white absolute top-1 transition-transform ${
-                  actuators.pumpIndoor.active ? 'translate-x-7' : 'translate-x-1'
+                <div className={`w-6 h-6 rounded-full bg-white absolute top-0.5 transition-transform ${
+                  actuators.pumpIndoor.active ? 'translate-x-[25px]' : 'translate-x-0.5'
                 }`} />
               </button>
             </div>
@@ -342,12 +342,12 @@ const ActuatorControl: React.FC<ActuatorControlProps> = ({
 
               <button
                 onClick={togglePumpOutdoor}
-                className={`w-14 h-8 rounded-full transition-colors relative focus:outline-none ${
-                  actuators.pumpOutdoor.active ? 'bg-teal-500' : 'bg-gray-300 dark:bg-gray-700'
+                className={`w-14 h-8 rounded-full transition-colors relative focus:outline-none border ${
+                  actuators.pumpOutdoor.active ? 'bg-teal-500 border-transparent' : 'bg-gray-250 dark:bg-gray-900 border-gray-300 dark:border-gray-805'
                 }`}
               >
-                <div className={`w-6 h-6 rounded-full bg-white absolute top-1 transition-transform ${
-                  actuators.pumpOutdoor.active ? 'translate-x-7' : 'translate-x-1'
+                <div className={`w-6 h-6 rounded-full bg-white absolute top-0.5 transition-transform ${
+                  actuators.pumpOutdoor.active ? 'translate-x-[25px]' : 'translate-x-0.5'
                 }`} />
               </button>
             </div>
@@ -435,12 +435,12 @@ const ActuatorControl: React.FC<ActuatorControlProps> = ({
 
               <button
                 onClick={toggleGrowLight}
-                className={`w-14 h-8 rounded-full transition-colors relative focus:outline-none ${
-                  actuators.growLight.active ? 'bg-purple-500' : 'bg-gray-300 dark:bg-gray-700'
+                className={`w-14 h-8 rounded-full transition-colors relative focus:outline-none border ${
+                  actuators.growLight.active ? 'bg-purple-500 border-transparent' : 'bg-gray-250 dark:bg-gray-900 border-gray-300 dark:border-gray-805'
                 }`}
               >
-                <div className={`w-6 h-6 rounded-full bg-white absolute top-1 transition-transform ${
-                  actuators.growLight.active ? 'translate-x-7' : 'translate-x-1'
+                <div className={`w-6 h-6 rounded-full bg-white absolute top-0.5 transition-transform ${
+                  actuators.growLight.active ? 'translate-x-[25px]' : 'translate-x-0.5'
                 }`} />
               </button>
             </div>
@@ -508,12 +508,12 @@ const ActuatorControl: React.FC<ActuatorControlProps> = ({
 
               <button
                 onClick={toggleCoolingFan}
-                className={`w-14 h-8 rounded-full transition-colors relative focus:outline-none ${
-                  actuators.coolingFan.active ? 'bg-sky-500' : 'bg-gray-300 dark:bg-gray-700'
+                className={`w-14 h-8 rounded-full transition-colors relative focus:outline-none border ${
+                  actuators.coolingFan.active ? 'bg-sky-500 border-transparent' : 'bg-gray-250 dark:bg-gray-900 border-gray-300 dark:border-gray-805'
                 }`}
               >
-                <div className={`w-6 h-6 rounded-full bg-white absolute top-1 transition-transform ${
-                  actuators.coolingFan.active ? 'translate-x-7' : 'translate-x-1'
+                <div className={`w-6 h-6 rounded-full bg-white absolute top-0.5 transition-transform ${
+                  actuators.coolingFan.active ? 'translate-x-[25px]' : 'translate-x-0.5'
                 }`} />
               </button>
             </div>
@@ -528,7 +528,7 @@ const ActuatorControl: React.FC<ActuatorControlProps> = ({
                   onChange={e => setActuators(p => ({ ...p, coolingFan: { ...p.coolingFan, auto: e.target.checked } }))}
                   className="sr-only peer"
                 />
-                <div className="w-9 h-5 bg-gray-200 dark:bg-gray-700 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all dark:border-gray-600 peer-checked:bg-brand-green"></div>
+                <div className="w-9 h-5 bg-gray-200 dark:bg-gray-900 border border-gray-300 dark:border-gray-750 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[1px] after:start-[1px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all dark:border-gray-650 peer-checked:bg-brand-green peer-checked:border-transparent"></div>
               </label>
             </div>
 

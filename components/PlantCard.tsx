@@ -75,7 +75,7 @@ const PlantCard: React.FC<PlantCardProps> = ({ plant, onWater, onLight, onCool, 
           <span className="text-sm font-medium text-gray-700 dark:text-gray-300">AI Optimized</span>
           <label className="inline-flex items-center cursor-pointer">
             <input type="checkbox" checked={plant.aiOptimized} onChange={() => onToggleAi(plant.id)} className="sr-only peer" />
-            <div className="relative w-11 h-6 bg-gray-200 dark:bg-gray-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-brand-green"></div>
+            <div className="relative w-11 h-6 bg-gray-205 dark:bg-gray-900 border border-gray-300 dark:border-gray-750 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-5 peer-checked:after:border-white after:content-[''] after:absolute after:top-[1px] after:start-[1px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4.5 after:w-4.5 after:transition-all dark:border-gray-650 peer-checked:bg-brand-green peer-checked:border-transparent"></div>
           </label>
         </div>
       </div>
