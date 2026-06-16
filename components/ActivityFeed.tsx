@@ -55,7 +55,7 @@ const ActivityFeed: React.FC<ActivityFeedProps> = ({ activities, plants }) => {
     <div className="space-y-4">
         <h3 className="text-lg font-semibold text-gray-800 dark:text-white">Recent Activity</h3>
         {sortedActivities.length > 0 ? (
-            <div className="space-y-4">
+            <div className="space-y-4 max-h-[380px] overflow-y-auto pr-2 recent-activity-scroll">
                 {sortedActivities.map(activity => (
                     <ActivityItem key={activity.id} activity={activity} plantName={getPlantName(activity.plantId)} />
                 ))}

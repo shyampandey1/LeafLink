@@ -61,3 +61,22 @@ body {
 .animate-breeze {
   animation: breeze 1.5s ease-in-out infinite;
 }
+
+/* Custom Scrollbar for Recent Activity Feed */
+.recent-activity-scroll::-webkit-scrollbar {
+  display: block !important;
+  width: 4px;
+}
+
+.recent-activity-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.recent-activity-scroll::-webkit-scrollbar-thumb {
+  background-color: rgba(156, 163, 175, 0.4);
+  border-radius: 9999px;
+}
+
+.dark .recent-activity-scroll::-webkit-scrollbar-thumb {
+  background-color: rgba(75, 85, 99, 0.5);
+}
