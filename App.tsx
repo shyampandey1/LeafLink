@@ -290,7 +290,7 @@ const App: React.FC = () => {
   // Fetch weather parameters
   const fetchWeather = useCallback(async (location: { lat: number; lon: number } | null) => {
     if (offlineMode) {
-      setWeatherInfo({ city: 'Kolkata (Local Cache)', temperature: 27, condition: 'Partly Cloudy', humidity: 75, windSpeed: 8 });
+      setWeatherInfo({ city: 'Mohali (Local Cache)', temperature: 27, condition: 'Partly Cloudy', humidity: 75, windSpeed: 8 });
       setWeatherLoading(false);
       return;
     }
@@ -309,23 +309,50 @@ const App: React.FC = () => {
   }, [offlineMode]);
 
   useEffect(() => {
-    if (navigator.geolocation && !offlineMode) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          fetchWeather({
-            lat: position.coords.latitude,
-            lon: position.coords.longitude,
-          });
-        },
-        (geoError) => {
-          console.error("Geolocation blocked:", geoError.message);
-          setWeatherError("Showing weather for Kolkata, India.");
-          fetchWeather(null);
-        }
-      );
-    } else {
-      fetchWeather(null);
-    }
+    const getGeoposition = async () => {
+      if (offlineMode) {
+        fetchWeather(null);
+        return;
+      }
+
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            fetchWeather({
+              lat: position.coords.latitude,
+              lon: position.coords.longitude,
+            });
+          },
+          async (geoError) => {
+            console.warn("Geolocation blocked/failed:", geoError.message);
+            
+            // Fallback to IP-based geolocation
+            try {
+              const res = await fetch('https://ipapi.co/json/');
+              if (res.ok) {
+                const data = await res.json();
+                if (data.latitude && data.longitude) {
+                  fetchWeather({
+                    lat: data.latitude,
+                    lon: data.longitude,
+                  });
+                  return;
+                }
+              }
+            } catch (ipError) {
+              console.error("IP geolocation failed:", ipError);
+            }
+            
+            // Hard fallback to Mohali, India coordinates if IP lookup also fails
+            fetchWeather({ lat: 30.69, lon: 76.73 });
+          }
+        );
+      } else {
+        fetchWeather(null);
+      }
+    };
+
+    getGeoposition();
   }, [offlineMode, fetchWeather]);
 
   const toggleTheme = async () => {
