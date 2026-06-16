@@ -290,7 +290,7 @@ const App: React.FC = () => {
   // Fetch weather parameters
   const fetchWeather = useCallback(async (location: { lat: number; lon: number } | null) => {
     if (offlineMode) {
-      setWeatherInfo({ city: 'Mohali (Local Cache)', temperature: 27, condition: 'Partly Cloudy', humidity: 75, windSpeed: 8 });
+      setWeatherInfo({ city: 'Ludhiana (Local Cache)', temperature: 27, condition: 'Partly Cloudy', humidity: 75, windSpeed: 8 });
       setWeatherLoading(false);
       return;
     }
@@ -343,8 +343,8 @@ const App: React.FC = () => {
               console.error("IP geolocation failed:", ipError);
             }
             
-            // Hard fallback to Mohali, India coordinates if IP lookup also fails
-            fetchWeather({ lat: 30.69, lon: 76.73 });
+            // Hard fallback to Ludhiana, India coordinates if IP lookup also fails
+            fetchWeather({ lat: 30.9120, lon: 75.8538 });
           }
         );
       } else {
