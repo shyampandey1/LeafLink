@@ -68,56 +68,91 @@ export const getCareRecommendation = async (plant: Plant): Promise<AiRecommendat
   }
 };
 
-export const getWeatherInfo = async (location: { lat: number; lon: number } | null): Promise<WeatherInfo> => {
+export const getWeatherInfo = async (location: { lat: number; lon: number } | string | null): Promise<WeatherInfo> => {
   const fallbackData: WeatherInfo = { city: 'Aujala', temperature: 29, condition: 'Partly Cloudy', humidity: 80, windSpeed: 10 };
-  
-  if (!process.env.API_KEY) {
-      console.warn("API_KEY not set. Returning dummy weather data.");
-      return fallbackData;
-  }
-  
-  const locationQuery = location
-    ? `for the location with latitude ${location.lat} and longitude ${location.lon}`
-    : 'in Aujala, Punjab, India';
-  
-  const prompt = `
-    What is the current weather ${locationQuery}? 
-    Provide the city name, temperature in Celsius, the weather condition (e.g., "Sunny", "Cloudy", "Rain", "Clear"), humidity as a percentage, and wind speed in km/h.
-    Format the response as a valid JSON object with five keys: "city" (string), "temperature" (number), "condition" (string), "humidity" (number), and "windSpeed" (number).
-    Do not include any other text, comments, or markdown formatting like \`\`\`json around the JSON object. Just the raw JSON.
-  `;
 
   try {
-    const response = await ai.models.generateContent({
-        model: "gemini-2.5-flash",
-        contents: prompt,
-        config: {
-            tools: [{ googleSearch: {} }],
-        },
-    });
+    let lat: number = 30.761838;
+    let lon: number = 76.632890;
+    let cityName = 'Aujala';
 
-    let jsonStr = response.text.trim();
-    const fenceRegex = /^```(\w*)?\s*\n?(.*?)\n?\s*```$/s;
-    const match = jsonStr.match(fenceRegex);
-    if (match && match[2]) {
-      jsonStr = match[2].trim();
+    if (location && typeof location === 'object' && 'lat' in location) {
+      lat = location.lat;
+      lon = location.lon;
+      
+      // Reverse geocode to get city name
+      try {
+        const geoRes = await fetch(
+          `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json`,
+          { headers: { 'User-Agent': 'LeafLink-Smart-Garden' } }
+        );
+        if (geoRes.ok) {
+          const geoData = await geoRes.json();
+          cityName = geoData.address.village || geoData.address.town || geoData.address.city || geoData.address.suburb || geoData.address.state || 'Local Station';
+        }
+      } catch (err) {
+        console.warn("Reverse geocoding failed, using coordinates as name:", err);
+        cityName = `${lat.toFixed(4)}, ${lon.toFixed(4)}`;
+      }
+    } else if (typeof location === 'string') {
+      cityName = location.split(',')[0].trim();
+      // Geocode city name to get coordinates
+      try {
+        const searchRes = await fetch(
+          `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(location)}&format=json&limit=1`,
+          { headers: { 'User-Agent': 'LeafLink-Smart-Garden' } }
+        );
+        if (searchRes.ok) {
+          const searchData = await searchRes.json();
+          if (searchData.length > 0) {
+            lat = parseFloat(searchData[0].lat);
+            lon = parseFloat(searchData[0].lon);
+          } else {
+            throw new Error("City not found");
+          }
+        } else {
+          throw new Error("Geocoding failed");
+        }
+      } catch (err) {
+        console.warn("Geocoding failed, using fallback coordinates:", err);
+        lat = 30.761838;
+        lon = 76.632890;
+      }
     }
-    
-    const parsedData: WeatherInfo = JSON.parse(jsonStr);
-    
-    if (typeof parsedData.city !== 'string' ||
-        typeof parsedData.temperature !== 'number' ||
-        typeof parsedData.condition !== 'string' ||
-        typeof parsedData.humidity !== 'number' ||
-        typeof parsedData.windSpeed !== 'number') {
-        throw new Error('Invalid weather data structure from API.');
+
+    // Fetch real-time weather from Open-Meteo
+    const weatherRes = await fetch(
+      `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,wind_speed_10m,weather_code`
+    );
+
+    if (!weatherRes.ok) {
+      throw new Error("Failed to fetch weather from Open-Meteo");
     }
-    
-    return parsedData;
+
+    const weatherData = await weatherRes.json();
+    const current = weatherData.current;
+
+    const mapWeatherCode = (code: number): string => {
+      if (code === 0) return 'Sunny';
+      if (code >= 1 && code <= 3) return 'Partly Cloudy';
+      if (code === 45 || code === 48) return 'Foggy';
+      if (code >= 51 && code <= 67) return 'Rainy';
+      if (code >= 71 && code <= 77) return 'Snowy';
+      if (code >= 80 && code <= 82) return 'Showers';
+      if (code >= 95 && code <= 99) return 'Thunderstorm';
+      return 'Clear';
+    };
+
+    return {
+      city: cityName,
+      temperature: Math.round(current.temperature_2m * 10) / 10,
+      condition: mapWeatherCode(current.weather_code),
+      humidity: current.relative_humidity_2m,
+      windSpeed: Math.round(current.wind_speed_10m * 10) / 10,
+    };
 
   } catch (error) {
-    console.error("Failed to get weather info from Gemini API:", error);
-    // Provide fallback data on failure to not break the UI
+    console.error("Failed to get weather info from real-time APIs:", error);
     return fallbackData;
   }
 };
