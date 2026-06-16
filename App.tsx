@@ -516,7 +516,7 @@ const App: React.FC = () => {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <div className="lg:col-span-2 space-y-8">
               {/* Grand System Vital Board */}
-              <div className="p-5 rounded-3xl bg-linear-to-br from-emerald-500 to-teal-600 dark:from-emerald-950/20 dark:to-teal-950/20 text-white shadow-md flex items-center justify-between border border-emerald-400/20">
+              <div className="p-5 rounded-3xl bg-gradient-to-br from-emerald-500 to-teal-600 dark:from-emerald-950/20 dark:to-teal-950/20 text-white shadow-md flex items-center justify-between border border-emerald-400/20">
                 <div className="space-y-1">
                   <span className="text-xs uppercase tracking-widest font-bold opacity-80">Botanical Health Index</span>
                   <div className="flex items-baseline gap-2">
