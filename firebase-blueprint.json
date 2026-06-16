@@ -1,0 +1,178 @@
+{
+  "entities": {
+    "User": {
+      "title": "User Profile",
+      "description": "User preferences and system-wide setting indicators.",
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string",
+          "description": "The firebase auth unique user identifier"
+        },
+        "email": {
+          "type": "string",
+          "description": "Email address of the operator user"
+        },
+        "theme": {
+          "type": "string",
+          "enum": ["light", "dark"],
+          "description": "Preferred interface theme"
+        },
+        "offlineMode": {
+          "type": "boolean",
+          "description": "Local cached mode bypass trigger flag"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Timestamp when user profile was instantiated"
+        }
+      },
+      "required": ["userId", "email", "theme", "offlineMode"]
+    },
+    "Plant": {
+      "title": "Plant Profile",
+      "description": "Botanical specimen parameters, structural metrics, and sensor records.",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer",
+          "description": "Numeric identifier of the plant"
+        },
+        "name": {
+          "type": "string",
+          "description": "Custom name assigned to this specimen"
+        },
+        "type": {
+          "type": "string",
+          "description": "Species classification enum"
+        },
+        "location": {
+          "type": "string",
+          "enum": ["Indoor", "Outdoor"],
+          "description": "Cultivation zone classification"
+        },
+        "health": {
+          "type": "string",
+          "enum": ["Good", "Needs Care", "Poor"],
+          "description": "Computed health status of the plant"
+        },
+        "temperature": {
+          "type": "number",
+          "description": "Ambient temperature in Celsius"
+        },
+        "soilMoisture": {
+          "type": "number",
+          "description": "Soil water volumetric ratio percentage"
+        },
+        "humidity": {
+          "type": "number",
+          "description": "Relative air humidity level percentage"
+        },
+        "ph": {
+          "type": "number",
+          "description": "Soil acidity factor index value"
+        },
+        "lightLumens": {
+          "type": "number",
+          "description": "Illumination intensity in lumens"
+        },
+        "height": {
+          "type": "number",
+          "description": "Current specimen height metric in centimeters"
+        },
+        "lastWatered": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Timestamp of last detected watering trigger"
+        },
+        "aiOptimized": {
+          "type": "boolean",
+          "description": "Whether automated Gemini care triggers are enabled"
+        },
+        "esp32DeviceId": {
+          "type": "string",
+          "description": "Paired ESP32 sensor hardware device serial node"
+        }
+      },
+      "required": ["id", "name", "type", "location", "health", "temperature", "soilMoisture", "humidity", "ph", "lightLumens", "height", "lastWatered", "aiOptimized", "esp32DeviceId"]
+    },
+    "ESP32Device": {
+      "title": "ESP32 Device Node",
+      "description": "Paired remote wireless GPIO hardware sensor micro-processor node.",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Identifier token of the ESP32 node"
+        },
+        "deviceName": {
+          "type": "string",
+          "description": "Explanatory human-readable hardware name"
+        },
+        "location": {
+          "type": "string",
+          "description": "Spatial deployment room or zone"
+        },
+        "status": {
+          "type": "string",
+          "enum": ["online", "offline"],
+          "description": "Hardware node online heartbeat connection status"
+        },
+        "lastSeen": {
+          "type": "string",
+          "format": "date-time",
+          "description": "ISO timestamp of last telemetry broadcast check-in"
+        }
+      },
+      "required": ["id", "deviceName", "location", "status", "lastSeen"]
+    },
+    "ActivityLog": {
+      "title": "Actuation and Care Activity Log",
+      "description": "Chronological record of manual watering, system notifications, or AI-driven interventions.",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer",
+          "description": "Unique identifier of log entry"
+        },
+        "plantId": {
+          "type": "integer",
+          "description": "Identifier code of target plant"
+        },
+        "type": {
+          "type": "string",
+          "description": "Operational event category tag"
+        },
+        "description": {
+          "type": "string",
+          "description": "Explanatory telemetry details"
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Timestamp when this event log was executed"
+        }
+      },
+      "required": ["id", "plantId", "type", "description", "timestamp"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "User",
+      "description": "Main user collection holding configuration preferences."
+    },
+    "/users/{userId}/plants/{plantId}": {
+      "schema": "Plant",
+      "description": "Individual plants listed under the given user profile."
+    },
+    "/users/{userId}/devices/{deviceId}": {
+      "schema": "ESP32Device",
+      "description": "Paired ESP32 sensor hardware nodes registered under the user profile."
+    },
+    "/users/{userId}/activities/{activityId}": {
+      "schema": "ActivityLog",
+      "description": "Action and automation log histories synced to Firestore."
+    }
+  }
+}

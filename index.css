@@ -1,0 +1,47 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Outfit:wght@400;500;600;700&display=swap');
+
+@layer base {
+  body {
+    font-family: 'Inter', system-ui, sans-serif;
+  }
+  
+  .font-outfit {
+    font-family: 'Outfit', sans-serif;
+  }
+  
+  .font-mono {
+    font-family: 'JetBrains Mono', monospace;
+  }
+}
+
+/* Custom native glassmorphism */
+.glassmorphism {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+.dark .glassmorphism {
+  background: rgba(31, 41, 55, 0.7);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+/* Dynamic glow effects */
+.glow-green {
+  box-shadow: 0 0 15px rgba(16, 185, 129, 0.2);
+}
+
+.glow-blue {
+  box-shadow: 0 0 15px rgba(59, 130, 246, 0.2);
+}
+
+/* Hide default browser scrollbars but preserve scrolling */
+::-webkit-scrollbar {
+  display: none !important;
+}
+
+body {
+  -ms-overflow-style: none !important;
+  scrollbar-width: none !important;
+}

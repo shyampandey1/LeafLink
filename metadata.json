@@ -1,0 +1,9 @@
+{
+  "name": "AI Smart Garden Dashboard",
+  "description": "A modern, mobile-first React application for managing indoor and outdoor plants with real-time health monitoring, AI-powered care recommendations, and interactive analytics.",
+  "requestFramePermissions": [
+    "geolocation"
+  ],
+  "prompt": "",
+  "majorCapabilities": []
+}

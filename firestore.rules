@@ -1,0 +1,192 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Global Safety Net (First block is a default-deny)
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Global reusable helpers
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isVerified() {
+      return isSignedIn() && request.auth.token.email_verified == true;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    function isValidUser(data) {
+      return data.userId is string 
+        && data.userId.size() <= 128
+        && data.email is string 
+        && data.email.size() <= 256
+        && data.theme is string 
+        && (data.theme == 'light' || data.theme == 'dark')
+        && data.offlineMode is bool
+        && data.keys().hasAll(['userId', 'email', 'theme', 'offlineMode'])
+        && data.keys().size() == 4;
+    }
+
+    function isValidPlant(data) {
+      return data.id is int
+        && data.name is string 
+        && data.name.size() <= 100
+        && data.type is string 
+        && data.type.size() <= 100
+        && data.location is string 
+        && (data.location == 'Indoor' || data.location == 'Outdoor')
+        && data.health is string 
+        && (data.health == 'Good' || data.health == 'Needs Care' || data.health == 'Poor')
+        && data.temperature is number 
+        && data.temperature >= -50 && data.temperature <= 100
+        && data.soilMoisture is number 
+        && data.soilMoisture >= 0 && data.soilMoisture <= 100
+        && data.humidity is number 
+        && data.humidity >= 0 && data.humidity <= 100
+        && data.ph is number 
+        && data.ph >= 0 && data.ph <= 14
+        && data.lightLumens is number 
+        && data.lightLumens >= 0 && data.lightLumens <= 1000000
+        && data.height is number 
+        && data.height >= 0 && data.height <= 10000
+        && data.lastWatered is string 
+        && data.lastWatered.size() <= 128
+        && data.aiOptimized is bool
+        && data.esp32DeviceId is string 
+        && data.esp32DeviceId.size() <= 128
+        && data.keys().hasAll([
+          'id', 'name', 'type', 'location', 'health', 'temperature', 
+          'soilMoisture', 'humidity', 'ph', 'lightLumens', 'height', 
+          'lastWatered', 'aiOptimized', 'esp32DeviceId'
+        ])
+        && data.keys().size() == 14;
+    }
+
+    function isValidDevice(data) {
+      return data.id is string 
+        && data.id.size() <= 128
+        && data.deviceName is string 
+        && data.deviceName.size() <= 128
+        && data.location is string 
+        && data.location.size() <= 128
+        && data.status is string 
+        && (data.status == 'online' || data.status == 'offline')
+        && data.lastSeen is string 
+        && data.lastSeen.size() <= 128
+        && data.keys().hasAll(['id', 'deviceName', 'location', 'status', 'lastSeen'])
+        && data.keys().size() == 5;
+    }
+
+    function isValidActivityLog(data) {
+      return data.id is int
+        && data.plantId is int
+        && data.type is string 
+        && data.type.size() <= 100
+        && data.description is string 
+        && data.description.size() <= 1000
+        && data.timestamp is string 
+        && data.timestamp.size() <= 128
+        && data.keys().hasAll(['id', 'plantId', 'type', 'description', 'timestamp'])
+        && data.keys().size() == 5;
+    }
+
+    // Users parent collection and subcollections
+    match /users/{userId} {
+      allow get: if isVerified() && request.auth.uid == userId;
+      allow create: if isVerified() && request.auth.uid == userId && isValidUser(incoming());
+      allow update: if isVerified() && request.auth.uid == userId && isValidUser(incoming()) && (
+        incoming().diff(existing()).affectedKeys().hasOnly(['theme', 'offlineMode'])
+      );
+      allow delete: if false;
+
+      // Subcollection: plants
+      match /plants/{plantId} {
+        allow get: if isVerified() && request.auth.uid == userId 
+          && isValidId(plantId)
+          && exists(/databases/$(database)/documents/users/$(userId));
+          
+        allow list: if isVerified() && request.auth.uid == userId;
+        
+        allow create: if isVerified() && request.auth.uid == userId 
+          && isValidId(plantId)
+          && exists(/databases/$(database)/documents/users/$(userId)) 
+          && isValidPlant(incoming());
+          
+        allow update: if isVerified() && request.auth.uid == userId 
+          && isValidId(plantId)
+          && exists(/databases/$(database)/documents/users/$(userId))
+          && isValidPlant(incoming())
+          && (
+            // Action 1: Water plant (soilMoisture, health, lastWatered)
+            incoming().diff(existing()).affectedKeys().hasOnly(['soilMoisture', 'health', 'lastWatered']) ||
+            // Action 2: Standard sensor telemetry refresh (temperature, soilMoisture, humidity, ph, lightLumens, height, health)
+            incoming().diff(existing()).affectedKeys().hasOnly(['temperature', 'soilMoisture', 'humidity', 'ph', 'lightLumens', 'height', 'health']) ||
+            // Action 3: Adjust optimization or single parameters
+            incoming().diff(existing()).affectedKeys().hasOnly(['aiOptimized', 'health']) ||
+            incoming().diff(existing()).affectedKeys().hasOnly(['lightLumens', 'health']) ||
+            incoming().diff(existing()).affectedKeys().hasOnly(['temperature', 'health']) ||
+            incoming().diff(existing()).affectedKeys().hasOnly(['soilMoisture', 'health']) ||
+            incoming().diff(existing()).affectedKeys().hasOnly(['aiOptimized'])
+          );
+          
+        allow delete: if isVerified() && request.auth.uid == userId 
+          && isValidId(plantId);
+      }
+
+      // Subcollection: devices
+      match /devices/{deviceId} {
+        allow get: if isVerified() && request.auth.uid == userId 
+          && isValidId(deviceId)
+          && exists(/databases/$(database)/documents/users/$(userId));
+          
+        allow list: if isVerified() && request.auth.uid == userId;
+        
+        allow create: if isVerified() && request.auth.uid == userId 
+          && isValidId(deviceId)
+          && exists(/databases/$(database)/documents/users/$(userId))
+          && isValidDevice(incoming());
+          
+        allow update: if isVerified() && request.auth.uid == userId 
+          && isValidId(deviceId)
+          && exists(/databases/$(database)/documents/users/$(userId))
+          && isValidDevice(incoming())
+          && (
+            incoming().diff(existing()).affectedKeys().hasOnly(['status', 'lastSeen'])
+          );
+          
+        allow delete: if isVerified() && request.auth.uid == userId 
+          && isValidId(deviceId);
+      }
+
+      // Subcollection: activities
+      match /activities/{activityId} {
+        allow get: if isVerified() && request.auth.uid == userId 
+          && isValidId(activityId)
+          && exists(/databases/$(database)/documents/users/$(userId));
+          
+        allow list: if isVerified() && request.auth.uid == userId;
+        
+        allow create: if isVerified() && request.auth.uid == userId 
+          && isValidId(activityId)
+          && exists(/databases/$(database)/documents/users/$(userId))
+          && isValidActivityLog(incoming());
+          
+        allow update: if false; // Logs are immutable chronological entries!
+        allow delete: if isVerified() && request.auth.uid == userId 
+          && isValidId(activityId);
+      }
+    }
+  }
+}
